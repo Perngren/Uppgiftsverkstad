@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uppgiftsverkstaden</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+  :root{
+    color-scheme:light dark;
+    --bg:#F6F3EA;
+    --surface:#FFFFFF;
+    --surface-2:#EDE7D8;
+    --text:#20241F;
+    --text-muted:#5C665D;
+    --accent:#1F6F5C;
+    --accent-ink:#F3FBF8;
+    --accent-2:#C9932A;
+    --border:#DBD4C0;
+    --danger:#A6432F;
+    --shadow: 0 1px 2px rgba(32,36,31,0.06), 0 8px 24px -12px rgba(32,36,31,0.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14181A;
+      --surface:#1C2320;
+      --surface-2:#242B27;
+      --text:#E9ECE7;
+      --text-muted:#9CAA9F;
+      --accent:#54B79A;
+      --accent-ink:#0E1A16;
+      --accent-2:#E8BE5C;
+      --border:#333C36;
+      --danger:#E08469;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 24px -12px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181A;
+    --surface:#1C2320;
+    --surface-2:#242B27;
+    --text:#E9ECE7;
+    --text-muted:#9CAA9F;
+    --accent:#54B79A;
+    --accent-ink:#0E1A16;
+    --accent-2:#E8BE5C;
+    --border:#333C36;
+    --danger:#E08469;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 8px 24px -12px rgba(0,0,0,0.6);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Karla', system-ui, sans-serif;
+    padding:0 16px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding-block:28px 60px;}
+
+  h1,h2,h3{font-family:'Fraunces', Georgia, serif; text-wrap:balance; margin:0;}
+  a{color:var(--accent);}
+
+  header.top{
+    display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+    padding-bottom:18px; margin-bottom:22px; border-bottom:1px solid var(--border);
+  }
+  header.top .mark{
+    font-size:1.9rem; line-height:1; color:var(--accent);
+  }
+  header.top h1{font-size:1.7rem; font-weight:600; color:var(--text);}
+  header.top p{margin:2px 0 0; color:var(--text-muted); font-size:0.97rem;}
+
+  .layout{
+    display:grid;
+    grid-template-columns: 340px 1fr;
+    gap:24px;
+    align-items:start;
+  }
+  @media (max-width:760px){ .layout{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+  }
+
+  .controls{padding:20px 20px 22px;}
+  .controls h2{font-size:1.05rem; margin-bottom:4px;}
+  .controls .lead{color:var(--text-muted); font-size:0.88rem; margin:2px 0 16px;}
+
+  fieldset{border:0; padding:0; margin:0 0 18px;}
+  legend{font-family:'Fraunces', serif; font-weight:600; font-size:0.98rem; padding:0 0 8px; width:100%;}
+
+  .area-row{
+    display:flex; align-items:flex-start; gap:10px;
+    padding:9px 10px; border-radius:9px; margin-bottom:4px;
+  }
+  .area-row:hover{background:var(--surface-2);}
+  .area-row input[type="checkbox"]{margin-top:3px; width:16px; height:16px; accent-color:var(--accent);}
+  .area-row label{font-weight:600; font-size:0.93rem; cursor:pointer;}
+  .area-row .sub{display:block; font-weight:400; color:var(--text-muted); font-size:0.82rem; margin-top:1px;}
+  .area-row .range-inline{margin-top:6px; display:flex; align-items:center; gap:6px; font-size:0.82rem; color:var(--text-muted);}
+  .area-row .range-inline input{width:44px; padding:3px 4px; border-radius:5px; border:1px solid var(--border); background:var(--bg); color:var(--text); font:inherit;}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-weight:600; font-size:0.9rem; margin-bottom:6px;}
+  .field .help{color:var(--text-muted); font-size:0.8rem; margin-top:5px;}
+  .field select, .field input[type="number"]{
+    width:100%; padding:8px 10px; border-radius:8px; border:1px solid var(--border);
+    background:var(--bg); color:var(--text); font:inherit; font-size:0.92rem;
+  }
+  .range-wrap{display:flex; align-items:center; gap:10px;}
+  .range-wrap input[type="range"]{flex:1; accent-color:var(--accent);}
+  .range-wrap .count{
+    font-family:'Fraunces', serif; font-weight:600; font-size:1.15rem; color:var(--accent);
+    width:1.6em; text-align:center;
+  }
+
+  .theme-swatches{display:flex; gap:8px;}
+  .theme-swatches label{
+    flex:1; border:1.5px solid var(--border); border-radius:9px; padding:8px 6px 7px;
+    text-align:center; cursor:pointer; font-size:0.78rem; font-weight:600; color:var(--text-muted);
+  }
+  .theme-swatches input{display:none;}
+  .theme-swatches input:checked + span{color:var(--accent);}
+  .theme-swatches label:has(input:checked){border-color:var(--accent); background:var(--surface-2); color:var(--accent);}
+  .swatch-bar{display:block; height:14px; border-radius:4px; margin-bottom:6px;}
+  .sw-enkel{background:linear-gradient(90deg,#fff 0 100%); border:1px solid var(--border);}
+  .sw-rutat{background-image:linear-gradient(#cfd6cf 1px, transparent 1px), linear-gradient(90deg,#cfd6cf 1px, transparent 1px); background-size:5px 5px; background-color:#fff; border:1px solid var(--border);}
+  .sw-farg{background:linear-gradient(90deg,#1F6F5C,#D9A526,#6B4C8A,#2D5C88);}
+
+  button.primary{
+    width:100%; padding:12px 16px; border-radius:10px; border:0; cursor:pointer;
+    background:var(--accent); color:var(--accent-ink); font:inherit; font-weight:700; font-size:0.98rem;
+    letter-spacing:0.01em;
+  }
+  button.primary:hover{filter:brightness(1.06);}
+  button.ghost{
+    padding:10px 14px; border-radius:9px; border:1.5px solid var(--border); cursor:pointer;
+    background:transparent; color:var(--text); font:inherit; font-weight:700; font-size:0.88rem;
+  }
+  button.ghost:hover{border-color:var(--accent); color:var(--accent);}
+  button:disabled{opacity:0.45; cursor:not-allowed;}
+
+  .warn{
+    display:none; background:#F7E6E1; border:1px solid var(--danger); color:var(--danger);
+    padding:8px 10px; border-radius:8px; font-size:0.83rem; margin-bottom:14px; font-weight:600;
+  }
+  :root:not([data-theme="light"]) .warn{background:rgba(224,132,105,0.12);}
+  .warn.show{display:block;}
+
+  details.howto{
+    margin-top:18px; border-top:1px solid var(--border); padding-top:14px;
+  }
+  details.howto summary{cursor:pointer; font-weight:700; font-size:0.88rem; color:var(--accent);}
+  details.howto ol{margin:10px 0 0; padding-left:20px; font-size:0.85rem; color:var(--text-muted); line-height:1.55;}
+
+  .workspace{min-height:200px;}
+  .empty-state{
+    padding:60px 30px; text-align:center; color:var(--text-muted);
+  }
+  .empty-state .mark{font-size:2.2rem; display:block; margin-bottom:10px;}
+  .empty-state h3{color:var(--text); font-size:1.15rem; margin-bottom:6px;}
+  .empty-state p{font-size:0.9rem; max-width:32em; margin:0 auto;}
+
+  .results-bar{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    padding:16px 20px; border-bottom:1px solid var(--border);
+  }
+  .results-bar h2{font-size:1.05rem;}
+  .results-bar .btns{display:flex; gap:8px; flex-wrap:wrap;}
+  .sheets-scroll{padding:22px; display:flex; flex-direction:column; gap:26px;}
+
+  /* ---- worksheet paper (screen preview + print) ---- */
+  .sheet-page{
+    color-scheme:light;
+    background:#FFFFFF; color:#1B1F1B;
+    width:100%; max-width:210mm; margin:0 auto;
+    aspect-ratio:210/297;
+    padding:14mm 13mm;
+    border:1px solid #D8D8D0; border-radius:2px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    font-family:'Atkinson Hyperlegible', Arial, sans-serif;
+    overflow:hidden;
+    display:flex; flex-direction:column;
+  }
+  .sheet-page.facit-page{background:#FBF8EE;}
+  .sheet-head{display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #1B1F1B; padding-bottom:8px; margin-bottom:6mm;}
+  .sheet-head h3{font-family:'Fraunces', serif; font-size:1.35rem; margin:0;}
+  .sheet-head .meta{font-size:0.8rem; color:#555; text-align:right;}
+  .sheet-head .meta .line{display:inline-block; border-bottom:1px solid #999; min-width:5.2em; margin-left:4px;}
+  .facit-tag{display:inline-block; background:#1F6F5C; color:#fff; font-size:0.68rem; font-weight:700; letter-spacing:0.04em; padding:2px 7px; border-radius:4px; text-transform:uppercase; margin-left:8px; vertical-align:2px;}
+
+  ol.tasks{list-style:none; margin:0; padding:0; counter-reset:tasknum; flex:1; display:flex; flex-direction:column; gap:7mm; justify-content:flex-start;}
+  ol.tasks > li{counter-increment:tasknum; display:flex; gap:10px; align-items:flex-start;}
+  .tnum{
+    flex:0 0 auto; width:1.7em; height:1.7em; border-radius:50%;
+    border:1.5px solid #1B1F1B; display:flex; align-items:center; justify-content:center;
+    font-weight:700; font-size:0.95rem;
+  }
+  .tbody{flex:1; min-width:0;}
+  .tbody .prop-text, .tbody .order-label, .tbody .conv-label{font-size:0.98rem; line-height:1.4;}
+  .tbody .answer-line{margin-top:3px; font-weight:700; color:#1F6F5C;}
+  .blank{display:inline-block; min-width:3.4em; border-bottom:1.6px solid #1B1F1B; margin:0 2px; height:1.05em;}
+  .blank.filled{border-bottom:none; font-weight:700; text-align:center;}
+
+  .op-task .expr{font-size:1.05rem; font-weight:600;}
+  .scratch-box{
+    margin-top:7px; width:8.5em; min-height:3.4em;
+    border:1.3px solid #b9b9b0; border-radius:5px;
+  }
+  .op-task .hint{display:block; font-size:0.72rem; color:#888; margin-top:3px; font-weight:400;}
+
+  .fracrow{display:flex; gap:16px; margin-top:4px; flex-wrap:wrap;}
+  .fracrow .fcell{text-align:center; min-width:4.6em;}
+  .fracrow .fval{font-size:1.05rem; font-weight:700; min-height:1.4em; border-bottom:1.6px solid #1B1F1B; display:flex; align-items:center; justify-content:center;}
+  .fracrow .fval.given{border-bottom:none; color:#1B1F1B;}
+  .fracrow .fval.solved{border-bottom:none; color:#1F6F5C;}
+  .fracrow .flabel{font-size:0.68rem; text-transform:uppercase; letter-spacing:0.03em; color:#666; margin-top:3px;}
+
+  .order-values{font-size:1.02rem; font-weight:600; margin-top:3px; letter-spacing:0.02em;}
+  .order-answer{margin-top:4px; font-weight:700; color:#1F6F5C;}
+
+  .sheet-foot{margin-top:auto; padding-top:6mm; font-size:0.7rem; color:#999; text-align:right;}
+
+  /* rutat theme */
+  .sheet-page[data-print-theme="rutat"]{
+    background-image:
+      linear-gradient(#E4E7DD 1px, transparent 1px),
+      linear-gradient(90deg, #E4E7DD 1px, transparent 1px);
+    background-size:7mm 7mm; background-color:#FFFDF6;
+  }
+  .sheet-page[data-print-theme="rutat"].facit-page{background-color:#FBF7EA;}
+  .sheet-page[data-print-theme="rutat"] .tnum{background:#FFFDF6;}
+
+  /* färgglad theme */
+  .sheet-page[data-print-theme="farg"] .tnum{color:#fff; border-color:transparent;}
+  .sheet-page[data-print-theme="farg"] li:nth-of-type(5n+1) .tnum{background:#1F6F5C;}
+  .sheet-page[data-print-theme="farg"] li:nth-of-type(5n+2) .tnum{background:#C9932A;}
+  .sheet-page[data-print-theme="farg"] li:nth-of-type(5n+3) .tnum{background:#6B4C8A;}
+  .sheet-page[data-print-theme="farg"] li:nth-of-type(5n+4) .tnum{background:#2D5C88;}
+  .sheet-page[data-print-theme="farg"] li:nth-of-type(5n+5) .tnum{background:#B5533C;}
+  .sheet-page[data-print-theme="farg"] .sheet-head{border-bottom-color:#C9932A;}
+  .sheet-page[data-print-theme="farg"] ol.tasks > li{
+    background:#FAF8F2; border-radius:10px; padding:2.5mm 3mm;
+  }
+
+  footer.credit{margin-top:30px; text-align:center; color:var(--text-muted); font-size:0.8rem;}
+
+  @media print{
+    body *{visibility:hidden;}
+    .print-area, .print-area *{visibility:visible;}
+    body{background:#fff; padding:0; margin:0;}
+    .print-area{position:absolute; top:0; left:0; width:100%;}
+    .sheet-page{
+      box-shadow:none; border:none; border-radius:0; width:100%; max-width:none;
+      aspect-ratio:auto; min-height:277mm; margin:0; page-break-after:always;
+    }
+    .sheet-page:last-child{page-break-after:auto;}
+    body:not([data-print-mode="sheets"]) .sheet-page.student-page{display:none;}
+    body:not([data-print-mode="facit"]) .sheet-page.facit-page{display:none;}
+    @page{ size:A4; margin:12mm; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <span class="mark">🧮</span>
+    <div>
+      <h1>Uppgiftsverkstaden</h1>
+      <p>Skapa startuppgifter för matteträning — välj område, antal och design, och skriv ut.</p>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <aside class="panel controls">
+      <h2>Ställ in ditt papper</h2>
+      <p class="lead">Kryssa i det du vill träna på just nu.</p>
+
+      <fieldset id="area-fieldset">
+        <legend>Områden</legend>
+
+        <div class="area-row">
+          <input type="checkbox" id="area-multab" checked>
+          <div>
+            <label for="area-multab">Multiplikationstabeller</label>
+            <span class="sub">t.ex. 7 × 8 = ___</span>
+            <div class="range-inline">
+              Talområde: <input type="number" id="multab-min" value="1" min="1" max="12"> –
+              <input type="number" id="multab-max" value="10" min="1" max="12">
+            </div>
+          </div>
+        </div>
+
+        <div class="area-row">
+          <input type="checkbox" id="area-addsub" checked>
+          <div>
+            <label for="area-addsub">Skriftlig addition &amp; subtraktion</label>
+            <span class="sub">uppställning, tvåsiffriga tal</span>
+          </div>
+        </div>
+
+        <div class="area-row">
+          <input type="checkbox" id="area-brak" checked>
+          <div>
+            <label for="area-brak">Bråk, decimal &amp; procent</label>
+            <span class="sub">omvandla och storleksordna</span>
+          </div>
+        </div>
+
+        <div class="area-row">
+          <input type="checkbox" id="area-multupp" checked>
+          <div>
+            <label for="area-multupp">Uppställning: 2-siffrigt × 1-siffrigt</label>
+            <span class="sub">t.ex. 34 × 6, uppställt</span>
+          </div>
+        </div>
+
+        <div class="area-row">
+          <input type="checkbox" id="area-prop" checked>
+          <div>
+            <label for="area-prop">Proportionalitet</label>
+            <span class="sub">t.ex. 2 munkar kostar 6 kr, vad kostar 12?</span>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="warn" id="warn-msg">Välj minst ett område innan du genererar uppgifter.</div>
+
+      <div class="field">
+        <label for="task-count">Antal uppgifter per papper: <span id="task-count-label"></span></label>
+        <div class="range-wrap">
+          <input type="range" id="task-count" min="4" max="10" value="6">
+          <span class="count" id="task-count-num">6</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="version-count">Antal olika versioner</label>
+        <input type="number" id="version-count" value="1" min="1" max="40">
+        <p class="help">Skriv t.ex. antal elever i klassen om alla ska få olika tal. Skriv 1 om alla ska ha samma papper.</p>
+      </div>
+
+      <div class="field">
+        <label>Design på pappret</label>
+        <div class="theme-swatches">
+          <label><input type="radio" name="ptheme" value="enkel" checked><span class="swatch-bar sw-enkel"></span>Enkel</label>
+          <label><input type="radio" name="ptheme" value="rutat"><span class="swatch-bar sw-rutat"></span>Rutat</label>
+          <label><input type="radio" name="ptheme" value="farg"><span class="swatch-bar sw-farg"></span>Färgglad</label>
+        </div>
+      </div>
+
+      <button class="primary" id="generate-btn">Generera uppgifter</button>
+
+      <details class="howto">
+        <summary>Så här funkar det</summary>
+        <ol>
+          <li>Välj vilka områden du vill träna på och hur många uppgifter varje papper ska ha (4–10 st).</li>
+          <li>Ange hur många olika versioner du vill ha — skriv en siffra per elev om alla ska få olika tal, annars räcker 1.</li>
+          <li>Välj en design och klicka på "Generera uppgifter".</li>
+          <li>Bläddra igenom förhandsvisningen till höger, klicka sedan på "Skriv ut elevpapper".</li>
+          <li>Klicka på "Skriv ut facit" för att skriva ut rättningsunderlaget åt dig själv, med samma uppgifter och rätt svar.</li>
+          <li>Vill du ha helt nya tal? Klicka på "Generera uppgifter" igen när som helst.</li>
+        </ol>
+      </details>
+    </aside>
+
+    <section class="panel workspace" id="workspace">
+      <div class="empty-state">
+        <span class="mark">✏️</span>
+        <h3>Inga uppgifter genererade än</h3>
+        <p>Ställ in dina val till vänster och klicka på "Generera uppgifter" så visas en förhandsvisning här — redo att skrivas ut.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="credit">Uppgiftsverkstaden — ett fristående verktyg för snabb repetition i matte, byggt för utskrift.</footer>
+</div>
+
+<div class="print-area" id="print-area"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  function rand(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  function choice(arr){ return arr[rand(0, arr.length - 1)]; }
+  function gcd(a,b){ a=Math.abs(a); b=Math.abs(b); while(b){ [a,b]=[b, a % b]; } return a || 1; }
+  function pad(n, w){ return String(n).padStart(w, ' '); }
+
+  function krFormat(v){
+    v = Math.round(v * 100) / 100;
+    if (Number.isInteger(v)) return v + ' kr';
+    return v.toFixed(2).replace('.', ',') + ' kr';
+  }
+
+  // ---------- fraction / decimal / percent ----------
+  var FRAC_DENOMS = [2,4,5,10,20,25,50,100];
+  function makeFracValue(){
+    var den = choice(FRAC_DENOMS);
+    var num = rand(1, den - 1);
+    var g = gcd(num, den);
+    var rnum = num / g, rden = den / g;
+    var hundredths = Math.round(num * 100 / den); // percent value, exact since all denoms divide 100
+    var decStr;
+    if (hundredths % 100 === 0) decStr = String(hundredths / 100);
+    else {
+      var whole = Math.floor(hundredths / 100);
+      var rem = hundredths % 100;
+      decStr = (rem % 10 === 0) ? (whole + ',' + (rem / 10)) : (whole + ',' + String(rem).padStart(2,'0'));
+    }
+    return {
+      fracStr: rnum + '/' + rden,
+      decStr: decStr,
+      percentStr: hundredths + ' %',
+      hundredths: hundredths
+    };
+  }
+
+  function renderFracRow(v, knownIndex, showAnswer){
+    // order: bråkform, decimalform, procentform
+    var labels = ['bråkform','decimalform','procentform'];
+    var vals = [v.fracStr, v.decStr, v.percentStr];
+    var html = '<div class="fracrow">';
+    for (var i=0;i<3;i++){
+      var known = (i === knownIndex);
+      var show = known || showAnswer;
+      var cls = known ? 'given' : (showAnswer ? 'solved' : '');
+      html += '<div class="fcell"><div class="fval ' + cls + '">' + (show ? vals[i] : '&nbsp;') + '</div><div class="flabel">' + labels[i] + '</div></div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function makeConvertTask(){
+    var v = makeFracValue();
+    var known = rand(0,2);
+    return {
+      area: 'brak', kind: 'convert', value: v, known: known,
+      render: function(showAnswer){
+        return '<div class="conv-label">Skriv om till de andra formerna:</div>' + renderFracRow(v, known, showAnswer);
+      }
+    };
+  }
+
+  function makeOrderTask(){
+    var n = choice([3,3,4]);
+    var vals = [], seen = {};
+    while (vals.length < n){
+      var v = makeFracValue();
+      if (seen[v.hundredths]) continue;
+      seen[v.hundredths] = true;
+      vals.push(v);
+    }
+    var forms = vals.map(function(v){
+      var f = choice(['frac','dec','pct']);
+      return f === 'frac' ? v.fracStr : (f === 'dec' ? v.decStr : v.percentStr);
+    });
+    var order = vals.map(function(v,i){ return i; });
+    // shuffle display order
+    var display = order.slice();
+    for (var i = display.length -1; i>0; i--){ var j = rand(0,i); [display[i],display[j]]=[display[j],display[i]]; }
+    var dir = choice(['asc','desc']);
+    var sorted = order.slice().sort(function(a,b){ return dir==='asc' ? vals[a].hundredths - vals[b].hundredths : vals[b].hundredths - vals[a].hundredths; });
+    return {
+      area:'brak', kind:'order',
+      render: function(showAnswer){
+        var dirText = dir === 'asc' ? 'från minst till störst' : 'från störst till minst';
+        var html = '<div class="order-label">Ordna talen ' + dirText + ':</div>';
+        html += '<div class="order-values">' + display.map(function(i){ return forms[i]; }).join('&nbsp;&nbsp;&nbsp;&nbsp;') + '</div>';
+        if (showAnswer){
+          var sign = dir === 'asc' ? ' &lt; ' : ' &gt; ';
+          html += '<div class="order-answer">' + sorted.map(function(i){ return forms[i]; }).join(sign) + '</div>';
+        }
+        return html;
+      }
+    };
+  }
+
+  // ---------- uppställning: plain expression, student sets up the columns themselves ----------
+  function renderOpTask(n1, n2, opSymbol, answer, showAnswer){
+    var expr = n1 + ' ' + opSymbol + ' ' + n2 + ' = ' + (showAnswer ? '<span class="blank filled">' + answer + '</span>' : '<span class="blank"></span>');
+    var html = '<div class="expr">' + expr + '</div>';
+    if (!showAnswer){
+      html += '<div class="scratch-box"></div><span class="hint">Ställ upp och räkna ut</span>';
+    }
+    return html;
+  }
+
+  function makeAddSubTask(){
+    var n1 = rand(10,99), n2 = rand(10,99);
+    var op = choice(['+','-']);
+    if (op === '-' && n2 > n1){ var t = n1; n1 = n2; n2 = t; }
+    var answer = op === '+' ? n1 + n2 : n1 - n2;
+    return {
+      area:'addsub',
+      render: function(showAnswer){ return '<div class="op-task">' + renderOpTask(n1, n2, op, answer, showAnswer) + '</div>'; }
+    };
+  }
+
+  function makeMultUppTask(){
+    var n1 = rand(10,99), n2 = rand(2,9);
+    var answer = n1 * n2;
+    return {
+      area:'multupp',
+      render: function(showAnswer){ return '<div class="op-task">' + renderOpTask(n1, n2, '×', answer, showAnswer) + '</div>'; }
+    };
+  }
+
+  function makeMultabTask(min, max){
+    var a = rand(min, max), b = rand(1,10);
+    if (Math.random() < 0.5){ var t=a; a=b; b=t; if (a < min || a > max){ a = rand(min,max); } }
+    var answer = a * b;
+    return {
+      area:'multab',
+      render: function(showAnswer){
+        return a + ' &times; ' + b + ' = ' + (showAnswer ? '<span class="blank filled">' + answer + '</span>' : '<span class="blank"></span>');
+      }
+    };
+  }
+
+  var PROP_ITEMS = ['munkar','pennor','klistermärken','äpplen','kex','saftflaskor','suddgummin','stjärnor till belöningshäftet','godisar','glaskulor','muffins','limstift'];
+  var PROP_UNIT = [1,1.5,2,2.5,3,4,5,6,8,10,12,15,20,25];
+  function makePropTask(){
+    var item = choice(PROP_ITEMS);
+    var n1 = rand(2,6);
+    var unit = choice(PROP_UNIT);
+    var price1 = Math.round(unit * n1 * 100) / 100;
+    var n2;
+    if (Math.random() < 0.5){
+      var k = choice([2,3,4]);
+      n2 = n1 * k;
+    } else {
+      do { n2 = rand(2,24); } while (n2 === n1);
+    }
+    var answer = Math.round(unit * n2 * 100) / 100;
+    return {
+      area:'prop',
+      render: function(showAnswer){
+        var html = '<div class="prop-text">Om ' + n1 + ' ' + item + ' kostar ' + krFormat(price1) + ', vad kostar ' + n2 + ' ' + item + '?</div>';
+        if (showAnswer){
+          html += '<div class="answer-line">Svar: ' + krFormat(answer) + ' <span style="font-weight:400;color:#666;">(pris/st: ' + krFormat(unit) + ')</span></div>';
+        }
+        return html;
+      }
+    };
+  }
+
+  function makeTask(area, opts){
+    switch(area){
+      case 'multab': return makeMultabTask(opts.multabMin, opts.multabMax);
+      case 'addsub': return makeAddSubTask();
+      case 'brak': return Math.random() < 0.55 ? makeConvertTask() : makeOrderTask();
+      case 'multupp': return makeMultUppTask();
+      case 'prop': return makePropTask();
+    }
+  }
+
+  // ---------- sheet building ----------
+  function buildVersion(selectedAreas, count, opts){
+    var tasks = [];
+    for (var i=0;i<count;i++){
+      var area = choice(selectedAreas);
+      tasks.push(makeTask(area, opts));
+    }
+    return tasks;
+  }
+
+  function sheetHTML(tasks, versionIndex, theme, isFacit){
+    var pageClass = 'sheet-page ' + (isFacit ? 'facit-page' : 'student-page');
+    var title = isFacit ? 'Startuppgift <span class="facit-tag">Facit</span>' : 'Startuppgift';
+    var meta = isFacit
+      ? '<div class="meta">Version ' + versionIndex + '</div>'
+      : '<div class="meta">Namn: <span class="line"></span><br>Datum: <span class="line"></span></div>';
+    var items = tasks.map(function(t, i){
+      return '<li><div class="tnum">' + (i+1) + '</div><div class="tbody">' + t.render(isFacit) + '</div></li>';
+    }).join('');
+    return '<div class="' + pageClass + '" data-print-theme="' + theme + '">' +
+      '<div class="sheet-head"><h3>' + title + '</h3>' + meta + '</div>' +
+      '<ol class="tasks">' + items + '</ol>' +
+      '<div class="sheet-foot">Version ' + versionIndex + ' &middot; Uppgiftsverkstaden</div>' +
+    '</div>';
+  }
+
+  // ---------- UI wiring ----------
+  var taskCountEl = document.getElementById('task-count');
+  var taskCountNum = document.getElementById('task-count-num');
+  taskCountEl.addEventListener('input', function(){ taskCountNum.textContent = taskCountEl.value; });
+
+  var generateBtn = document.getElementById('generate-btn');
+  var warnMsg = document.getElementById('warn-msg');
+  var workspace = document.getElementById('workspace');
+  var printArea = document.getElementById('print-area');
+
+  var AREA_IDS = { multab:'area-multab', addsub:'area-addsub', brak:'area-brak', multupp:'area-multupp', prop:'area-prop' };
+
+  function selectedAreas(){
+    var list = [];
+    Object.keys(AREA_IDS).forEach(function(key){
+      if (document.getElementById(AREA_IDS[key]).checked) list.push(key);
+    });
+    return list;
+  }
+
+  var lastVersions = null;
+
+  function generate(){
+    var areas = selectedAreas();
+    if (areas.length === 0){
+      warnMsg.classList.add('show');
+      return;
+    }
+    warnMsg.classList.remove('show');
+
+    var count = parseInt(taskCountEl.value, 10);
+    var versions = Math.max(1, Math.min(60, parseInt(document.getElementById('version-count').value, 10) || 1));
+    var theme = document.querySelector('input[name="ptheme"]:checked').value;
+    var multabMin = Math.max(1, parseInt(document.getElementById('multab-min').value,10) || 1);
+    var multabMax = Math.max(multabMin, parseInt(document.getElementById('multab-max').value,10) || 10);
+
+    var opts = { multabMin: multabMin, multabMax: multabMax };
+
+    var allVersions = [];
+    for (var v=1; v<=versions; v++){
+      allVersions.push(buildVersion(areas, count, opts));
+    }
+    lastVersions = { versions: allVersions, theme: theme };
+
+    renderWorkspace(lastVersions);
+    renderPrintArea(lastVersions);
+  }
+
+  function renderWorkspace(data){
+    var html = '<div class="results-bar"><h2>' + data.versions.length + ' version' + (data.versions.length>1?'er':'') + ' genererad' + (data.versions.length>1?'e':'') + '</h2>' +
+      '<div class="btns">' +
+        '<button class="ghost" id="print-sheets-btn">🖨️ Skriv ut elevpapper</button>' +
+        '<button class="ghost" id="print-facit-btn">🖨️ Skriv ut facit</button>' +
+      '</div></div>';
+    html += '<div class="sheets-scroll">';
+    data.versions.forEach(function(tasks, i){
+      html += sheetHTML(tasks, i+1, data.theme, false);
+    });
+    html += '</div>';
+    workspace.innerHTML = html;
+    document.getElementById('print-sheets-btn').addEventListener('click', function(){ doPrint('sheets'); });
+    document.getElementById('print-facit-btn').addEventListener('click', function(){ doPrint('facit'); });
+  }
+
+  function renderPrintArea(data){
+    var html = '';
+    data.versions.forEach(function(tasks, i){
+      html += sheetHTML(tasks, i+1, data.theme, false);
+    });
+    data.versions.forEach(function(tasks, i){
+      html += sheetHTML(tasks, i+1, data.theme, true);
+    });
+    printArea.innerHTML = html;
+  }
+
+  function doPrint(mode){
+    document.body.setAttribute('data-print-mode', mode);
+    window.print();
+  }
+
+  generateBtn.addEventListener('click', generate);
+
+  // generate an initial example so the page isn't empty on first view
+  document.getElementById('task-count').value = 6;
+  generate();
+})();
+</script>
+</body>
+</html>
